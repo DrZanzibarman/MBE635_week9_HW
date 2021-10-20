@@ -1,0 +1,249 @@
+---
+title: "week_9_hw"
+author: "Benjamin Gulmon"
+date: "10/18/2021"
+output: html_document
+---
+
+Loading libraries
+```{r library set-up}
+
+library(tidyr)
+#library(plyr)
+library(ggplot2)
+library(magrittr)
+library(ggplot2)
+library(dplyr)
+
+```
+
+
+Import and clean the data for future processing
+```{R Data Import}
+
+#toggle between:
+
+#for desktop
+SWars_Raw <- read.csv("C:/Users/B/OneDrive/U_Miami/Fall 2021/MBE_635/Weekly/week 10/tidy_HW/star_wars.csv")
+
+#for laptop
+#SWars_Raw <- read.csv("C:/Users/bengu/OneDrive/U_Miami/Fall 2021/MBE_635/Weekly/week 10/tidy_HW/star_wars.csv")
+
+colnames(SWars_Raw) <-c('RespondentID', 'Seen_YN', 'Fan_YN', 'Seen_EpI', 'Seen_EpII', 'Seen_EpIII', 'Seen_EpIV', 'Seen_Epv', 'Seen_EpVI', 'Rank_EpI', 'Rank_EpII', 'Rank_EpIII', 'Rank_EpIV', 'Rank_EpV', 'Rank_EpVI', 'View_Han', 'View_Luke', 'View_Leia', 'View_Ani', 'View_Obi', 'View_Emp', 'View_Vader', 'View_Lando', 'View_Boba', 'View_3po', 'View_R2', 'View_Jar', 'View_Padme', 'View_Yoda', 'Shot_First', 'Know_EU', 'Fan_EU', 'Trek_Fan', 'Gender', 'Age', 'Household_Income', 'Education', 'Census_Region')
+
+SWars_Raw <- SWars_Raw[-c(1), ]
+
+
+SWars_Clean <- SWars_Raw
+
+SWars_Clean$Age <- factor(SWars_Clean$Age, levels = c("18-29", "30-44", "45-60", '> 60', "Response"))
+
+SWars_Clean$Education <- factor(SWars_Clean$Education, levels = c("Less than high school degree", "High school degree", "Some college or Associate degree", "Bachelor degree", "Graduate degree", " ", "Response"))
+
+SWars_Clean$Fan_YN <- factor(SWars_Clean$Fan_YN, levels = c("Yes", "No", " ", "Response"))
+
+SWars_Clean$Trek_Fan <- factor(SWars_Clean$Trek_Fan, levels = c("Yes", "No", " ", "Response"))
+
+```
+
+##Movie Ranker
+this set of functions takes the raw ranking data and turns it into manipulateable metrics.
+```{r Movie Ranker}
+
+SWars_fork <- SWars_Clean
+
+SWars_fork <- transform(SWars_fork[grep("^\\d$", SWars_Clean$Rank_EpI),,drop=F])
+
+Ep_Rank_2 <- data.frame(c(mean(as.numeric(SWars_fork$Rank_EpI)), mean(as.numeric(SWars_fork$Rank_EpII)), mean(as.numeric(SWars_fork$Rank_EpIII), na.rm = TRUE), mean(as.numeric(SWars_fork$Rank_EpIV)), mean(as.numeric(SWars_fork$Rank_EpV)), mean(as.numeric(SWars_fork$Rank_EpVI))))
+
+Ep_Rank_2 <- cbind(Ep_Rank_2,
+      c(
+        data.frame(c(sd(as.numeric(SWars_fork$Rank_EpI)), sd(as.numeric(SWars_fork$Rank_EpII)), sd(as.numeric(SWars_fork$Rank_EpIII), na.rm = TRUE), sd(as.numeric(SWars_fork$Rank_EpIV)), sd(as.numeric(SWars_fork$Rank_EpV)), sd(as.numeric(SWars_fork$Rank_EpVI))), check.names = FALSE),
+      
+      data.frame(c(NROW(as.numeric(SWars_fork$Rank_EpI)), NROW(as.numeric(SWars_fork$Rank_EpII)), NROW(as.numeric(SWars_fork$Rank_EpIII)), NROW(as.numeric(SWars_fork$Rank_EpIV)), NROW(as.numeric(SWars_fork$Rank_EpV)), NROW(as.numeric(SWars_fork$Rank_EpVI))), check.names = FALSE)
+      )
+)
+
+colnames(Ep_Rank_2) <- c('Mean', 'StdDev', 'Count')
+
+Ep_Rank_2 <- mutate(Ep_Rank_2, se = StdDev/sqrt(Count),
+       upper_limit=Mean+1*StdDev, 
+       lower_limit=Mean-1*StdDev)
+
+Ep_Rank_2 <- cbind(c('Ep_I', 'Ep_II', 'Ep_III', 'Ep_IV', 'Ep_V', 'Ep_VI'), Ep_Rank_2)
+
+colnames(Ep_Rank_2) <- c('Episode', 'Mean', 'StdDev', 'Count', 'StandardError', 'upper', 'lower')
+
+```
+
+
+
+```{r test space, include=FALSE}
+ggplot(data=SWars_Clean)+
+  geom_bar(mapping = aes(x=SWars_Clean$Fan_YN
+                         
+  )
+  )
+          
+
+SWars_Clean %>% 
+  select(Fan_YN) %>%
+  filter(!Fan_YN == c("Response")) %>% ggplot(.)+
+  geom_bar(mapping = aes(x=Fan_YN
+                        )
+  )
+  
+           
+        
+
+```
+
+
+##demographics
+
+use filter() from dplyr to get rid of bad inputs
+
+```{r Demographics - old, include=FALSE}
+# ggplot(data=SWars_Clean)+
+#   geom_bar(mapping = aes(x= interaction( Age, Gender)
+#                          ),
+#            stat = 'count',
+#            
+#           )
+
+ggplot(data=SWars_Clean)+
+  geom_bar(mapping = aes(x= Age,
+                         fill = Gender
+                         ),
+           stat = 'count',
+           position = "dodge"
+          )
+
+ggplot(data=SWars_Clean)+
+  geom_bar(mapping = aes(x= Age,
+                         fill = Gender
+                         ),
+           stat = 'count',
+           position = "dodge"
+          )+
+  facet_wrap(vars(Education))
+
+ggplot()+
+    geom_bar(mapping = aes(x= SWars_Clean$Census_Region,
+                           fill = SWars_Clean$Gender
+                         ),
+           stat = 'count',
+           position = "dodge",
+    )
+```
+
+```{r Demographics}
+SWars_Clean %>% 
+  select(Age, Gender) %>%
+  filter(!Age == c("Response")) %>%
+  ggplot(.)+
+    geom_bar(mapping = aes(x= Age,
+                         fill = Gender
+                          ),
+            stat = 'count',
+            position = "dodge"
+            )
+
+SWars_Clean %>% 
+  select(Age, Gender, Education) %>%
+  filter(!Age == c("Response")) %>%
+  ggplot(.)+
+    geom_bar(
+      mapping = aes(x = Age,
+                    fill = Gender),
+      stat = 'count',
+      position = "dodge"
+    ) +
+    facet_wrap(vars(Education))
+
+SWars_Clean %>% 
+  select(Gender, Census_Region) %>%
+  filter(!Gender == c("Response")) %>%
+  ggplot()+
+    geom_bar(mapping = aes(x= Census_Region,
+                           fill = Gender
+                         ),
+           stat = 'count',
+           position = "dodge",
+    )
+```
+
+
+##Fan vs. Non-Fan
+need to implement filter()
+```{r Fan vs. Non-Fan}
+
+SWars_Clean %>% 
+  select(Age, Gender, 'Fan_YN') %>%
+  filter(!Age == c("Response")) %>%
+  ggplot(.)+
+    geom_bar(mapping = aes(x= Age,
+                           fill = Gender
+                           ),
+             stat = 'count',
+             position = "dodge"
+            )+
+    facet_wrap(vars(Fan_YN))
+
+SWars_Clean %>% 
+  select(Gender, 'Fan_YN', 'Trek_Fan') %>%
+  filter(!Gender == c("Response")) %>%
+  ggplot(.)+
+    geom_bar(mapping = aes(x = 'Trek_Fan',
+                           fill = Gender
+                           ),
+             stat = 'count',
+             position = "dodge"
+            )+
+    facet_wrap(vars(Fan_YN))
+
+
+```
+
+
+
+```{r Movie Rank}
+
+ggplot(data=Ep_Rank_2)+
+  geom_point(mapping = aes( y = Mean, x = Episode
+
+                         ),
+           stat = 'identity',
+
+          )+
+  geom_errorbar(mapping = aes(
+                           x = Episode,
+                           ymin = Ep_Rank_2$lower,
+                           ymax = Ep_Rank_2$upper,
+                           ),
+               width = 0.2,
+               size = 1,
+
+               stat = "identity",
+               inherit.aes = FALSE
+  )
+
+```
+
+
+
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
