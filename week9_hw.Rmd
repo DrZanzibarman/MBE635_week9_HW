@@ -44,10 +44,12 @@ SWars_Clean$Fan_YN <- factor(SWars_Clean$Fan_YN, levels = c("Yes", "No", " ", "R
 
 SWars_Clean$Trek_Fan <- factor(SWars_Clean$Trek_Fan, levels = c("Yes", "No", " ", "Response"))
 
+SWars_Clean$Gender <- factor(SWars_Clean$Gender, levels = c("Female", "Male", "None Given "))
+
 ```
 
 ##Movie Ranker
-this set of functions takes the raw ranking data and turns it into manipulateable metrics.
+this set of functions takes the raw ranking data and turns it into manipulable metrics.
 ```{r Movie Ranker}
 
 SWars_fork <- SWars_Clean
@@ -78,7 +80,7 @@ colnames(Ep_Rank_2) <- c('Episode', 'Mean', 'StdDev', 'Count', 'StandardError', 
 
 
 
-```{r test space, include=FALSE}
+```{r test space, eval=FALSE, include=FALSE}
 ggplot(data=SWars_Clean)+
   geom_bar(mapping = aes(x=SWars_Clean$Fan_YN
                          
@@ -97,6 +99,8 @@ SWars_Clean %>%
         
 
 ```
+
+
 
 
 ##demographics
@@ -136,6 +140,9 @@ ggplot()+
            position = "dodge",
     )
 ```
+
+
+
 
 ```{r Demographics}
 SWars_Clean %>% 
@@ -227,6 +234,30 @@ ggplot(data=Ep_Rank_2)+
                stat = "identity",
                inherit.aes = FALSE
   )
+
+```
+
+
+```{r Character_views}
+
+# Han Solo
+# Neither favorably nor unfavorably (neutral) 2
+# Somewhat favorably 3
+# Somewhat unfavorably  1
+# Unfamiliar (N/A)  N/A
+# Very favorably  4
+# Very unfavorably  0
+
+SWars_Clean %>% 
+  select(View_Han, Gender) %>%
+  ggplot(.)+
+    geom_bar(mapping = aes(x = View_Han,
+                           fill = Gender
+                           ),
+             stat = 'count',
+             position = "dodge"
+            )
+
 
 ```
 
