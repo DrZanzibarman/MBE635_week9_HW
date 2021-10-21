@@ -57,3 +57,11 @@ levels(SWars_Clean$View_Han)
 # Unfamiliar (N/A)  N/A
 # Very favorably  4
 # Very unfavorably  0
+
+
+
+
+
+SWars_Test_3 <- SWars_Clean %>% 
+  mutate(across(matches("View_Luke"),
+        recode, 'Very unfavorably' = '1', 'Very favorably' = '5'))

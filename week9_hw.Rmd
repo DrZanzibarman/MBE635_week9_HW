@@ -154,7 +154,11 @@ SWars_Clean %>%
                           ),
             stat = 'count',
             position = "dodge"
-            )
+            )+
+    scale_fill_manual(values = c("#999999", "#000000"))+
+     labs(x = "Age of Respondant", 
+        y = 'Number of Respondants',
+        title = "Age of Respondants")
 
 SWars_Clean %>% 
   select(Age, Gender, Education) %>%
@@ -165,8 +169,12 @@ SWars_Clean %>%
                     fill = Gender),
       stat = 'count',
       position = "dodge"
-    ) +
-    facet_wrap(vars(Education))
+    )+
+    facet_wrap(vars(Education))+
+    scale_fill_manual(values = c("#999999", "#000000"))+
+    labs(x = "Age of Respondant", 
+         y = 'N',
+         title = "Respondants by Age and Education")
 
 SWars_Clean %>% 
   select(Gender, Census_Region) %>%
@@ -177,7 +185,8 @@ SWars_Clean %>%
                          ),
            stat = 'count',
            position = "dodge",
-    )
+    )+
+    scale_fill_manual(values = c("#999999", "#000000"))
 ```
 
 
