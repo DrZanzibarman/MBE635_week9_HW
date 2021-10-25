@@ -65,3 +65,59 @@ levels(SWars_Clean$View_Han)
 SWars_Test_3 <- SWars_Clean %>% 
   mutate(across(matches("View_*"),
         recode, 'Very unfavorably' = '1','Somewhat unfavorably' ='2', 'Neither favorably nor unfavorably (neutral)'='3', 'Somewhat favorably' = '4', 'Very favorably' = '5', 'Unfamiliar (N/A)'=NULL))
+
+Char_Rank <- SWars_Test_3 %>% 
+  select(matches("View_*"))
+
+
+# sd_MR=sd(MR_pmol_s),
+#             N_N=n(),
+#             se=sd_MR/sqrt(N_N),
+#             upper_limit=mean_MR+1*sd_MR, 
+#             lower_limit=mean_MR-1*sd_MR 
+#   )
+
+        
+#test_test <- cbind(colnames(Char_Rank_Sum),Char_test)
+                
+                
+#Char_test <- t(Char_Rank)%>%
+  
+Char_Sum_test <-summarise(test_test, mean_view=mean(as.numeric(test_test),trim = 0,), .groups=rowwise)
+
+
+
+Char_Rank_Sum <-cbind(
+  data.frame(c(mean(as.numeric(Char_Rank$View_Han), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Luke), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Leia), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Ani), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Obi), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Emp), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Vader), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Lando), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Boba), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_3po), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_R2), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Jar), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Padme), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Yoda), na.rm = TRUE)
+                )),
+  data.frame(c(sd(as.numeric(Char_Rank$View_Han), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Luke), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Leia), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Ani), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Obi), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Emp), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Vader), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Lando), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Boba), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_3po), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_R2), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Jar), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Padme), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Yoda), na.rm = TRUE)
+              )),
+  colSums(!is.na(Char_Rank))
+  )
+
