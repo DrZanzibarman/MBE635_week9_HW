@@ -5,6 +5,9 @@ date: "10/18/2021"
 output: html_document
 ---
 
+The most current version of this project can be found [here on Github](https://github.com/DrZanzibarman/MBE635_week9_HW.git)
+
+
 Loading libraries
 ```{r library set-up, message=FALSE, warning=FALSE}
 
@@ -14,6 +17,7 @@ library(ggplot2)
 library(magrittr)
 library(ggplot2)
 library(dplyr)
+library(rlang)
 
 ```
 
@@ -26,10 +30,10 @@ Import and clean the data for future processing
 #toggle between:
 
 #for desktop
-SWars_Raw <- read.csv("C:/Users/B/OneDrive/U_Miami/Fall 2021/MBE_635/Weekly/week 10/tidy_HW/star_wars.csv")
+#SWars_Raw <- read.csv("C:/Users/B/OneDrive/U_Miami/Fall 2021/MBE_635/Weekly/week 10/tidy_HW/star_wars.csv")
 
 #for laptop
-#SWars_Raw <- read.csv("C:/Users/bengu/OneDrive/U_Miami/Fall 2021/MBE_635/Weekly/week 10/tidy_HW/star_wars.csv")
+SWars_Raw <- read.csv("C:/Users/bengu/OneDrive/U_Miami/Fall 2021/MBE_635/Weekly/week 10/tidy_HW/star_wars.csv")
 
 colnames(SWars_Raw) <-c('RespondentID', 'Seen_YN', 'Fan_YN', 'Seen_EpI', 'Seen_EpII', 'Seen_EpIII', 'Seen_EpIV', 'Seen_Epv', 'Seen_EpVI', 'Rank_EpI', 'Rank_EpII', 'Rank_EpIII', 'Rank_EpIV', 'Rank_EpV', 'Rank_EpVI', 'View_Han', 'View_Luke', 'View_Leia', 'View_Ani', 'View_Obi', 'View_Emp', 'View_Vader', 'View_Lando', 'View_Boba', 'View_3po', 'View_R2', 'View_Jar', 'View_Padme', 'View_Yoda', 'Shot_First', 'Know_EU', 'Fan_EU', 'Trek_Fan', 'Gender', 'Age', 'Household_Income', 'Education', 'Census_Region')
 
