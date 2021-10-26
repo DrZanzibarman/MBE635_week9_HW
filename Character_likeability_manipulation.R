@@ -121,3 +121,10 @@ Char_Rank_Sum <-cbind(
   colSums(!is.na(Char_Rank))
   )
 
+colnames(Char_Rank_Sum) <- c('Mean', 'StdDev', 'Count')
+
+Char_Rank_Sum <- mutate(Char_Rank_Sum, se = StdDev/sqrt(Count),
+                    upper_limit=Mean+1*StdDev, 
+                    lower_limit=Mean-1*StdDev)
+
+Char_Rank_Sum <- cbind(colnames(Char_Rank), Char_Rank_Sum)
