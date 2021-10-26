@@ -6,7 +6,7 @@ output: html_document
 ---
 
 Loading libraries
-```{r library set-up}
+```{r library set-up, message=FALSE, warning=FALSE}
 
 library(tidyr)
 #library(plyr)
@@ -20,6 +20,8 @@ library(dplyr)
 
 Import and clean the data for future processing
 ```{R Data Import}
+
+#This is dependent on where the .csv file is located.  In my case, it is located either on my laptop or on my pc and I can swap back and forth depending on what device i am using,
 
 #toggle between:
 
@@ -55,7 +57,7 @@ SWars_Clean$Gender <- factor(SWars_Clean$Gender, levels = c("Female", "Male", "N
 
 ```
 
-##Movie Ranker
+## Movie Ranker
 this set of functions takes the raw ranking data and turns it into manipulable metrics.
 ```{r Movie Ranker}
 
@@ -174,9 +176,8 @@ SWars_Clean %>%
 
 
 
-##demographics
+## Demographics
 
-use filter() from dplyr to get rid of bad inputs
 
 ```{r Demographics - old, include=FALSE}
 # ggplot(data=SWars_Clean)+
@@ -211,8 +212,6 @@ ggplot()+
            position = "dodge",
     )
 ```
-
-
 
 
 ```{r Demographics}
@@ -257,12 +256,15 @@ SWars_Clean %>%
            stat = 'count',
            position = "dodge",
     )+
-    scale_fill_manual(values = c("#999999", "#000000"))
+    scale_fill_manual(values = c("#999999", "#000000"))+
+     labs(x = "Location of Respondent", 
+        y = 'Number of Respondents',
+        title = "Location of of Respondents by Gender")
 ```
 
 
-##Fan vs. Non-Fan
-need to implement filter()
+## Fan vs. Non-Fan
+
 ```{r Fan vs. Non-Fan}
 
 SWars_Clean %>% 
@@ -293,7 +295,7 @@ SWars_Clean %>%
 ```
 
 
-
+## Movie Rank
 ```{r Movie Rank}
 
 ggplot(data=Ep_Rank_2)+
@@ -314,11 +316,13 @@ ggplot(data=Ep_Rank_2)+
                stat = "identity",
                inherit.aes = FALSE
   )
-
 ```
 
+## Character Rank
 
 ```{r Character_views}
+
+
 
 ggplot(data=Char_Rank_Sum)+
   geom_point(mapping = aes( y = Mean, x = Character
@@ -339,6 +343,16 @@ ggplot(data=Char_Rank_Sum)+
                inherit.aes = FALSE
   )
 
+SWars_Clean %>% 
+  filter(View_Han == c('1', '2','3','4','5'))%>%
+  ggplot(.)+
+    geom_bar(mapping = aes(
+                          x=View_Han,
+                          fill = Gender
+                          ),
+      stat = 'count',
+      position = 'dodge'
+      )
 
 ```
 
