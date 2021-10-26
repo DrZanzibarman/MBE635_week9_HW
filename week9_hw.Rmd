@@ -34,6 +34,11 @@ colnames(SWars_Raw) <-c('RespondentID', 'Seen_YN', 'Fan_YN', 'Seen_EpI', 'Seen_E
 SWars_Raw <- SWars_Raw[-c(1), ]
 
 
+SWars_Raw <- SWars_Raw %>% 
+  mutate(across(matches("View_*"),
+        recode, 'Very unfavorably' = '1','Somewhat unfavorably' ='2', 'Neither favorably nor unfavorably (neutral)'='3', 'Somewhat favorably' = '4', 'Very favorably' = '5', 'Unfamiliar (N/A)'=NULL))
+
+
 SWars_Clean <- SWars_Raw
 
 SWars_Clean$Age <- factor(SWars_Clean$Age, levels = c("18-29", "30-44", "45-60", '> 60', "Response"))
@@ -46,6 +51,8 @@ SWars_Clean$Trek_Fan <- factor(SWars_Clean$Trek_Fan, levels = c("Yes", "No", " "
 
 SWars_Clean$Gender <- factor(SWars_Clean$Gender, levels = c("Female", "Male", "None Given "))
 
+
+
 ```
 
 ##Movie Ranker
@@ -56,7 +63,15 @@ SWars_fork <- SWars_Clean
 
 SWars_fork <- transform(SWars_fork[grep("^\\d$", SWars_Clean$Rank_EpI),,drop=F])
 
-Ep_Rank_2 <- data.frame(c(mean(as.numeric(SWars_fork$Rank_EpI)), mean(as.numeric(SWars_fork$Rank_EpII)), mean(as.numeric(SWars_fork$Rank_EpIII), na.rm = TRUE), mean(as.numeric(SWars_fork$Rank_EpIV)), mean(as.numeric(SWars_fork$Rank_EpV)), mean(as.numeric(SWars_fork$Rank_EpVI))))
+Ep_Rank_2 <-
+  data.frame(c(
+    mean(as.numeric(SWars_fork$Rank_EpI)),
+    mean(as.numeric(SWars_fork$Rank_EpII)),
+    mean(as.numeric(SWars_fork$Rank_EpIII), na.rm = TRUE),
+    mean(as.numeric(SWars_fork$Rank_EpIV)),
+    mean(as.numeric(SWars_fork$Rank_EpV)),
+    mean(as.numeric(SWars_fork$Rank_EpVI))
+  ))
 
 Ep_Rank_2 <- cbind(Ep_Rank_2,
       c(
@@ -78,6 +93,62 @@ colnames(Ep_Rank_2) <- c('Episode', 'Mean', 'StdDev', 'Count', 'StandardError', 
 
 ```
 
+```{r Character Ranker, warning=FALSE}
+
+#moved to data import section
+# SWars_Test_3 <- SWars_Clean %>% 
+#   mutate(across(matches("View_*"),
+#         recode, 'Very unfavorably' = '1','Somewhat unfavorably' ='2', 'Neither favorably nor unfavorably (neutral)'='3', 'Somewhat favorably' = '4', 'Very favorably' = '5', 'Unfamiliar (N/A)'=NULL))
+
+Char_Rank <- SWars_Clean %>% 
+  select(matches("View_*"))
+
+
+Char_Rank_Sum <-cbind(
+  data.frame(c(mean(as.numeric(Char_Rank$View_Han), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Luke), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Leia), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Ani), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Obi), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Emp), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Vader), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Lando), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Boba), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_3po), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_R2), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Jar), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Padme), na.rm = TRUE),
+             mean(as.numeric(Char_Rank$View_Yoda), na.rm = TRUE)
+                )),
+  data.frame(c(sd(as.numeric(Char_Rank$View_Han), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Luke), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Leia), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Ani), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Obi), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Emp), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Vader), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Lando), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Boba), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_3po), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_R2), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Jar), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Padme), na.rm = TRUE),
+             sd(as.numeric(Char_Rank$View_Yoda), na.rm = TRUE)
+              )),
+  colSums(!is.na(Char_Rank))
+  )
+
+colnames(Char_Rank_Sum) <- c('Mean', 'StdDev', 'Count')
+
+Char_Rank_Sum <- mutate(Char_Rank_Sum, se = StdDev/sqrt(Count),
+                    upper_limit=Mean+1*StdDev, 
+                    lower_limit=Mean-1*StdDev)
+
+Char_Rank_Sum <- cbind(colnames(Char_Rank), Char_Rank_Sum)
+
+colnames(Char_Rank_Sum) <- c('Character', 'Mean', 'StdDev', 'Count', 'StandardError', 'upper', 'lower')
+
+```
 
 
 ```{r test space, eval=FALSE, include=FALSE}
@@ -249,23 +320,24 @@ ggplot(data=Ep_Rank_2)+
 
 ```{r Character_views}
 
-# Han Solo
-# Neither favorably nor unfavorably (neutral) 2
-# Somewhat favorably 3
-# Somewhat unfavorably  1
-# Unfamiliar (N/A)  N/A
-# Very favorably  4
-# Very unfavorably  0
+ggplot(data=Char_Rank_Sum)+
+  geom_point(mapping = aes( y = Mean, x = Character
 
-SWars_Clean %>% 
-  select(View_Han, Gender) %>%
-  ggplot(.)+
-    geom_bar(mapping = aes(x = View_Han,
-                           fill = Gender
+                         ),
+           stat = 'identity',
+
+          )+
+  geom_errorbar(mapping = aes(
+                           x = Character,
+                           ymin = lower,
+                           ymax = upper,
                            ),
-             stat = 'count',
-             position = "dodge"
-            )
+               width = 0.2,
+               size = 1,
+
+               stat = "identity",
+               inherit.aes = FALSE
+  )
 
 
 ```
